@@ -1,20 +1,44 @@
 const functions = require("firebase-functions");
+const admin = require('firebase-admin');
+admin.initializeApp();
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
-
-exports.notifyUsercreation = functions.firestore.document("/{users}/{id}")
-    .onCreate((snap, context) => {
-        console.log(snap);
-        const collection = context.params.users;
+exports.logUserCreation = functions.firestore.document("/{collectionName}/{id}")
+    .onCreate(async (snap, context) => {
+        const collection = context.params.collectionName;
         const id = context.params.id;
-        console.log("I am Here for reason");
-        console.log(collection);
-        console.log(id);
-        return null;
+        if (collection === 'users') {
+            const info = await admin.firestore().collection('users').doc(id).get();
+            const fullname = info._fieldsProto.firstname.stringValue + ' ' + info._fieldsProto.lastname.stringValue
+            await admin.firestore().collection("users").doc(id).update({
+                fullname: fullname,
+            });
+            const activities = admin.firestore().collection('logs');
+            return activities.add({
+                activity: 'User  Created On Signup',
+                user_doc_id: id,
+            });
+        }
     });
+
+exports.logUserUpdate = functions.firestore.document("/{collectionName}/{id}")
+    .onUpdate(async (snap, context) => {
+        const collection = context.params.collectionName;
+        const id = context.params.id;
+        if (collection === 'users') {
+            const info = await admin.firestore().collection('users').doc(id).get();
+            const fullname = info._fieldsProto.firstname.stringValue + ' ' + info._fieldsProto.lastname.stringValue
+            await admin.firestore().collection("users").doc(id).update({
+                fullname: fullname,
+            });
+            const activities = admin.firestore().collection('logs');
+            return activities.add({
+                activity: 'User Updated On Profile Updated',
+                user_doc_id: id
+            });
+        }
+    });
+
+exports.getrandmNumber = functions.https.onRequest((request, response) => {
+    const number = Math.round(Math.random() * 100);
+    response.send(number.toString());
+})
