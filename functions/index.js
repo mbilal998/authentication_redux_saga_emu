@@ -1,6 +1,29 @@
 const functions = require("firebase-functions");
-const admin = require('firebase-admin');
-admin.initializeApp();
+const { admin, db } = require('./config/connection');
+
+var express = require('express') // Initialize Express
+var app = express() // Object
+
+var cors = require('cors');
+app.use(cors());
+
+var bodyParser = require('body-parser') // JSON Parse
+app.use(bodyParser.urlencoded({ extended: false })) // UrlEncoded Parse
+
+app.use(bodyParser.json()) // Define in express
+
+const router = require('express').Router() // Define Express Router
+
+// ON Resquest Function is endpoint function that directly call from browser
+// On Call Function is function that directly call inside your code
+
+const { getUser, getRandomNumber, getSingleUser } = require('./API/user');
+
+router.get('/getUser', cors(), getUser);
+router.get('/getRandomNumber', cors(), getRandomNumber);
+router.get('/getSingleUser', getSingleUser);
+
+exports.api = functions.https.onRequest(router)
 
 exports.logUserCreation = functions.firestore.document("/{collectionName}/{id}")
     .onCreate(async (snap, context) => {
@@ -37,8 +60,3 @@ exports.logUserUpdate = functions.firestore.document("/{collectionName}/{id}")
             });
         }
     });
-
-exports.getrandmNumber = functions.https.onRequest((request, response) => {
-    const number = Math.round(Math.random() * 100);
-    response.send(number.toString());
-})

@@ -7,6 +7,7 @@ import Login from "./Login";
 import PrivateRoute from "./PrivateRoute";
 import ForgetPassword from "./ForgetPassword";
 import UpdateProfile from "./UpdateProfile";
+import Users from "./Users";
 
 import { history } from "../redux/store";
 import { ConnectedRouter } from "connected-react-router";
@@ -31,6 +32,9 @@ function App() {
               </Route>
               <Route path="/forget-password">
                 <ForgetPassword />
+              </Route>
+              <Route path="/getUsers">
+                <Users />
               </Route>
             </Switch>
           </ConnectedRouter>
