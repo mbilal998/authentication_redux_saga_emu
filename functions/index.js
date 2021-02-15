@@ -12,15 +12,15 @@ app.use(bodyParser.urlencoded({ extended: false })) // UrlEncoded Parse
 
 app.use(bodyParser.json()) // Define in express
 
-const router = require('express').Router() // Define Express Router
+const router = require('express').Router().use(cors()) // Define Express Router
 
 // ON Resquest Function is endpoint function that directly call from browser
 // On Call Function is function that directly call inside your code
 
 const { getUser, getRandomNumber, getSingleUser } = require('./API/user');
 
-router.get('/getUser', cors(), getUser);
-router.get('/getRandomNumber', cors(), getRandomNumber);
+router.get('/getUser', getUser);
+router.get('/getRandomNumber', getRandomNumber);
 router.get('/getSingleUser', getSingleUser);
 
 exports.api = functions.https.onRequest(router)
